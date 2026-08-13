@@ -1,0 +1,1 @@
+export { Metodo } from "./Metodo";

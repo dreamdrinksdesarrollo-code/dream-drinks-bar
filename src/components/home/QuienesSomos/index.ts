@@ -1,0 +1,1 @@
+export { QuienesSomos } from './QuienesSomos';

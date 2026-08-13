@@ -1,0 +1,1 @@
+export { Testimonios } from "./Testimonios";
