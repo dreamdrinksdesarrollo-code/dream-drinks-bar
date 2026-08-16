@@ -1,15 +1,15 @@
 export const serviciosData = [
   {
+    titulo: "New York (Isla)",
+    descripcion:
+      "Inspirada en el estilo Art Deco de los años 20, combina carácter, diseño y funcionalidad en una configuración central. También se adapta a modalidades de barra lineal.",
+    imagen: "/assets/barras/NEW YORK.png",
+  },
+  {
     titulo: "Octogonal (Isla)",
     descripcion:
       "Diseño de atención 360°, ideal para convertirse en el centro del evento y atender grandes cantidades de invitados.",
     imagen: "/assets/barras/OCTOGONAL.jpeg",
-  },
-  {
-    titulo: "New York (Isla)",
-    descripcion:
-      "Inspirada en el estilo industrial neoyorquino, combina carácter, diseño y funcionalidad en una configuración central.",
-    imagen: "/assets/barras/NEW YORK.png",
   },
   {
     titulo: "Vintage",

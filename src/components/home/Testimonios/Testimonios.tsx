@@ -33,6 +33,13 @@ const testimonios = [
       "Seba cómo estás? Nada más que palabras de agradecimiento saben el cariño que le tenemos toda la familia! Agradecerle la predisposición la buena onda. Fran estaba feliz, que era lo que nos importaba a todos! Me alegro mucho que hayan sido ustedes quienes estaban ahí desde su trabajo y también desde la presencia y nada muy muy felices de toda la gente estaba súper conforme como siempre su trabajo, es impecable!!! Es un placer contratarlos. Gracias gracias y gracias!!!",
     estrellas: 5,
   },
+  {
+    nombre: "Juan Pablo Amado",
+    evento: "Evento",
+    texto:
+      "Seba buenos días, queria agradecer y felicitar por el trabajo que tuvieron! El cliente y los invitados quedaron muy conformes! Muchas gracias por la buena predisposición de siempre",
+    estrellas: 5,
+  },
 ];
 
 const empresas = [
@@ -43,6 +50,7 @@ const empresas = [
   { nombre: "Monks", src: "/assets/logoEmpresas/MONKS.png" },
   { nombre: "Óga Pizzeria", src: "/assets/logoEmpresas/OGA.png" },
   { nombre: "Pepe", src: "/assets/logoEmpresas/PEPE.png" },
+  { nombre: "Royal Enfield", src: "/assets/logoEmpresas/royal-enfield.png" },
   { nombre: "Torre Rivera", src: "/assets/logoEmpresas/TORRE RIVERA.png" },
 ];
 
@@ -199,26 +207,42 @@ export const Testimonios = () => {
 
         {/* Empresas que confiaron */}
         <div className="border-t border-white/8 pt-14 mt-14 overflow-hidden">
-          <p className="text-center text-gray-400 text-[10px] uppercase tracking-[0.08em] font-medium mb-10">
+          <p className="text-center text-gray-300 text-xs md:text-sm uppercase tracking-[0.12em] font-semibold mb-10">
             Empresas que confiaron en nosotros
           </p>
           <div className="overflow-hidden">
             <div className="marquee-track flex items-center gap-8 md:gap-24 w-max">
-              {[...empresas, ...empresas].map((empresa, i) => (
+              {[...empresas, ...empresas].map((empresa, i) => {
+                const isTorre = empresa.nombre === "Torre Rivera";
+                const isRoyal = empresa.nombre === "Royal Enfield";
+                const sizeClass = isTorre
+                  ? "w-[150px] md:w-[180px] h-16 md:h-20"
+                  : isRoyal
+                    ? "w-[100px] md:w-[120px] h-11 md:h-12"
+                    : "w-[110px] md:w-[130px] h-12 md:h-14";
+                const width = isTorre ? 180 : isRoyal ? 120 : 130;
+                const height = isTorre ? 80 : isRoyal ? 48 : 56;
+                return (
                 <div
                   key={`${empresa.nombre}-${i}`}
-                  className="flex-shrink-0 flex items-center justify-center w-[110px] md:w-[130px] h-12 md:h-14"
+                  className={`flex-shrink-0 flex items-center justify-center ${sizeClass}`}
                   title={empresa.nombre}
                 >
                   <Image
                     src={empresa.src}
                     alt={empresa.nombre}
-                    width={130}
-                    height={56}
-                    className="empresa-logo w-full h-full object-contain"
+                    width={width}
+                    height={height}
+                    unoptimized={isRoyal}
+                    className={
+                      isRoyal
+                        ? "w-full h-full object-contain opacity-35 hover:opacity-70 transition-opacity duration-300"
+                        : "empresa-logo w-full h-full object-contain"
+                    }
                   />
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

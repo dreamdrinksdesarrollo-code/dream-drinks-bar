@@ -8,11 +8,12 @@ export const Hero = () => {
   const [videoReady, setVideoReady] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [audioError, setAudioError] = useState(false);
+  const [needsGesture, setNeedsGesture] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   /** Si el usuario apagó el audio a propósito, no lo volvemos a forzar */
   const userStoppedRef = useRef(false);
+  const wasPlayingBeforeHideRef = useRef(false);
 
-  // Prevent browser from restoring previous scroll position
   useEffect(() => {
     window.history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
@@ -26,8 +27,10 @@ export const Hero = () => {
       audio.volume = 0.7;
       await audio.play();
       setAudioError(false);
+      setNeedsGesture(false);
       return true;
     } catch {
+      setNeedsGesture(true);
       return false;
     }
   }, []);
@@ -53,7 +56,7 @@ export const Hero = () => {
     };
   }, []);
 
-  // Autoplay al entrar (si el browser lo bloquea, arranca en la 1ª interacción)
+  // Autoplay + unlock en la 1ª interacción (PC / mobile)
   useEffect(() => {
     let unlocked = false;
 
@@ -72,19 +75,55 @@ export const Hero = () => {
 
     const removeListeners = () => {
       window.removeEventListener("pointerdown", onGesture);
+      window.removeEventListener("click", onGesture);
       window.removeEventListener("keydown", onGesture);
       window.removeEventListener("touchstart", onGesture);
       window.removeEventListener("scroll", onGesture);
+      window.removeEventListener("wheel", onGesture);
     };
 
     void tryStart();
 
     window.addEventListener("pointerdown", onGesture, { passive: true });
+    window.addEventListener("click", onGesture, { passive: true });
     window.addEventListener("keydown", onGesture);
     window.addEventListener("touchstart", onGesture, { passive: true });
     window.addEventListener("scroll", onGesture, { passive: true });
+    window.addEventListener("wheel", onGesture, { passive: true });
 
     return removeListeners;
+  }, [startAudio]);
+
+  // Pausar al cambiar de app / pestaña; reanudar al volver
+  useEffect(() => {
+    const onVisibility = () => {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      if (document.hidden) {
+        wasPlayingBeforeHideRef.current = !audio.paused && !userStoppedRef.current;
+        if (!audio.paused) audio.pause();
+        return;
+      }
+
+      if (wasPlayingBeforeHideRef.current && !userStoppedRef.current) {
+        void startAudio();
+      }
+    };
+
+    const onPageHide = () => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      wasPlayingBeforeHideRef.current = !audio.paused && !userStoppedRef.current;
+      audio.pause();
+    };
+
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", onPageHide);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", onPageHide);
+    };
   }, [startAudio]);
 
   const toggleAudio = async () => {
@@ -93,6 +132,7 @@ export const Hero = () => {
 
     if (!audio.paused) {
       userStoppedRef.current = true;
+      wasPlayingBeforeHideRef.current = false;
       audio.pause();
       return;
     }
@@ -114,14 +154,12 @@ export const Hero = () => {
 
       <audio
         ref={audioRef}
-        src="/assets/audio/stay-inside.mp3"
+        src="/assets/audio/off-my-mind.mp3"
         loop
         preload="auto"
         playsInline
-        autoPlay
       />
 
-      {/* Video — starts invisible, fades in when ready. Scale hides watermark. */}
       <div className="absolute inset-0 overflow-hidden">
         <video
           autoPlay
@@ -139,14 +177,13 @@ export const Hero = () => {
         <div className="absolute inset-0 bg-black/55" />
       </div>
 
-      {/* Music toggle — bottom left */}
       <button
         onClick={toggleAudio}
-        className="absolute bottom-8 left-6 z-20 flex items-center gap-2 text-white/50 hover:text-white/90 transition-colors duration-300 text-xs group"
+        className="absolute bottom-8 left-6 z-20 flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-300 text-xs group"
         aria-label={audioPlaying ? "Silenciar música" : "Reproducir música"}
         title={
           audioError
-            ? "No se encontró el audio (public/assets/audio/stay-inside.mp3)"
+            ? "No se encontró el audio"
             : audioPlaying
               ? "Apagar música"
               : "Encender música"
@@ -160,21 +197,24 @@ export const Hero = () => {
               <span className="w-0.5 bg-current rounded-full animate-[bounce_0.7s_ease-in-out_0.3s_infinite] h-1.5" />
               <span className="w-0.5 bg-current rounded-full animate-[bounce_0.7s_ease-in-out_0.05s_infinite] h-3" />
             </span>
-            <span>Stay Inside — Sandy Rivera</span>
+            <span>Off my mind — Mallin</span>
           </>
         ) : (
           <>
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.064A4 4 0 108 17V8.82l8-1.6V13.064A4 4 0 1020 15V3h-2z" />
             </svg>
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              {audioError ? "Audio no disponible" : "Stay Inside — Sandy Rivera"}
+            <span className={needsGesture ? "opacity-100" : "opacity-100 md:opacity-70 group-hover:opacity-100 transition-opacity duration-200"}>
+              {audioError
+                ? "Audio no disponible"
+                : needsGesture
+                  ? "Click para activar música"
+                  : "Off my mind — Mallin"}
             </span>
           </>
         )}
       </button>
 
-      {/* Content */}
       <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-16 flex flex-col items-center text-center">
         <div className="relative w-72 h-36 md:w-80 md:h-40 mb-8">
           <Image
@@ -205,7 +245,6 @@ export const Hero = () => {
         </Link>
       </div>
 
-      {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
         <svg className="w-6 h-6 text-white" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
           <path d="M19 14l-7 7m0 0l-7-7m7 7V3" />

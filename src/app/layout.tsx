@@ -30,7 +30,7 @@ export default function RootLayout({
           type="video/mp4"
         />
       </head>
-      <body className={montserrat.className} suppressHydrationWarning={true}>
+      <body className={`${montserrat.className} md:pb-12`} suppressHydrationWarning={true}>
         <Header />
         {children}
         <Footer />

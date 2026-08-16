@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { SectionHeader, sectionDescClass } from "@/components/shared/SectionHeader";
 
 const paragraphs = [
-  "Hace más de 12 años entendimos que un servicio de coctelería no consiste únicamente en preparar excelentes tragos.",
+  "En Dream Drinks hace más de 12 años entendimos que un servicio de coctelería no consiste únicamente en preparar excelentes tragos.",
   "Consiste en acompañar uno de los momentos más importantes de la vida de nuestros clientes.",
   "Por eso cuidamos cada detalle: la presentación, la calidad de los insumos, la atención del bartender, la estética de nuestras barras y la experiencia completa de cada invitado.",
   "Con cientos de eventos realizados en distintas ciudades y provincias, hoy somos una de las empresas referentes en coctelería premium para eventos en el NEA.",
